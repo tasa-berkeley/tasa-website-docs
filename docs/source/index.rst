@@ -25,7 +25,6 @@ tasa_website structure
 
 .. toctree::
    :maxdepth: 3
-   :caption: Contents:
 
    nonpackage
    package

@@ -33,6 +33,364 @@
             
   <div class="section" id="tasa-website-folder-package">
 <span id="package"></span><h1>tasa_website folder (package)<a class="headerlink" href="#tasa-website-folder-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="init-py">
+<h2>__init__.py<a class="headerlink" href="#init-py" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">g</span>
+
+<span class="c1"># These 2 import statements are at the bottom of the file</span>
+<span class="kn">import</span> <span class="nn">tasa_website.views</span>
+<span class="kn">import</span> <span class="nn">tasa_website.auth</span>
+</pre></div>
+</div>
+<div class="section" id="imports">
+<h3>Imports<a class="headerlink" href="#imports" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">os</span></code></p></li>
+</ol>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>From the <a class="reference external" href="https://docs.python.org/3/library/os.html">Python docs</a>, “this module provides a
+portable way of using operating system dependent functionality,” e.g. getting the current working
+directory with the <code class="xref py py-func docutils literal notranslate"><span class="pre">getcwd()</span></code> function.</p></li>
+</ol>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">string</span></code></p></li>
+</ol>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>From the <a class="reference external" href="https://docs.python.org/2/library/string.html">Python docs</a>, “the <code class="xref py py-class docutils literal notranslate"><span class="pre">string</span></code>
+module contains a number of useful constants and classes, as well as some deprecated legacy
+functions that are also available as methods on strings.”</p></li>
+</ol>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p><code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">sqlite3</span></code></p></li>
+</ol>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>Lets you use SQLite</p></li>
+<li><p>“SQLite is a C library that provides a lightweight disk-based database that doesn’t require a
+separate server process and allows accessing the database using a nonstandard variant of the SQL
+query language.”</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>John Denero’s lectures on YouTube, specifically 61A Fall 2018 Lectures <a class="reference external" href="https://youtube.com/playlist?list=PL6BsET-8jgYUzGbLeB0UjKjJnGAtxO43h">32</a>, <a class="reference external" href="https://youtube.com/playlist?list=PL6BsET-8jgYVk_CBkIP9WbxckgwMIWuTk">33</a>, <a class="reference external" href="https://youtube.com/playlist?list=PL6BsET-8jgYVSWsg45Zm-aSb7it_mvuOZ">34</a>,
+<a class="reference external" href="https://youtube.com/playlist?list=PL6BsET-8jgYWoTuANOebuQVct9mAovzga">35</a> provide a brief explanation on SQL and declarative programming.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/2/library/sqlite3.html">Python docs</a> for SQLite3</p></li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li><p><code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">yaml</span></code></p></li>
+</ol>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>“<strong>YAML</strong> (“YAML Ain’t Markup Language”) is a <a class="reference external" href="https://en.wikipedia.org/wiki/Human-readable">human-readable</a> <a class="reference external" href="https://en.wikipedia.org/wiki/Serialization">data-serialization language</a>.
+It is commonly used for <a class="reference external" href="https://en.wikipedia.org/wiki/Configuration_file">configuration files</a>, but could be used in many applications where
+data is being stored (e.g. debugging output) or transmitted (e.g. document headers).” (Wikipedia)</p></li>
+<li><p>“YAML may be the most human friendly format for structured data invented so far.”
+<a class="reference external" href="https://wiki.python.org/moin/YAML">(Python Wiki for YAML)</a></p></li>
+<li><p>YAML files are used to store data in a readable manner. In the case of the website, they store
+secure login information and API keys. We store the website login, the application secret key,
+and the Facebook API key on <code class="file docutils literal notranslate"><span class="pre">config.yaml</span></code>.</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>This is secure information and therefore, should never be pushed to the public tasa_website
+GitHub. You should have a version of it on your machine from the instructions on how to set
+up the website locally and there’s a copy on the server. It is added to the .gitignore so
+that you don’t accidentally stage, commit, or push it to the public repository.</strong></p></li>
+</ul>
+</div></blockquote>
+<ol class="loweralpha simple" start="4">
+<li><p>The website uses PyYAML to parse stuff in <code class="file docutils literal notranslate"><span class="pre">config.yaml</span></code>.</p></li>
+<li><p><a class="reference external" href="https://pyyaml.org/wiki/PyYAMLDocumentation">PyYAML Documentation</a></p></li>
+</ol>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p><code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">contextlib</span> <span class="pre">import</span> <span class="pre">closing</span></code></p></li>
+</ol>
+<blockquote>
+<div><ol class="loweralpha">
+<li><p>“This module provides utilities for common tasks involving the with statement.”
+(<a class="reference external" href="https://docs.python.org/2/library/contextlib.html">Python docs</a> for the Context Manager
+library)</p></li>
+<li><p>Allows for usage of with statements which is not a built-in functionality of Python.</p></li>
+<li><p>See: <a class="reference external" href="http://book.pythontips.com/en/latest/context_managers.html">http://book.pythontips.com/en/latest/context_managers.html</a></p></li>
+<li><p>From the <a class="reference external" href="https://book.pythontips.com/en/latest/context_managers.html">Python Tips</a> book:</p>
+<blockquote>
+<div><ul>
+<li><p>Context managers allow you to allocate and release resources precisely when you want to.
+The most widely used example of context managers is the <code class="docutils literal notranslate"><span class="pre">with</span></code> statement. Suppose you have
+two related operations which you’d like to execute as a pair, with a block of code in between.
+Context managers allow you to do specifically that. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;some_file&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">opened_file</span><span class="p">:</span>
+    <span class="n">opened_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Hola!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><ul>
+<li><p>The above code opens the file, writes some data to it and then closes it. If an error
+occurs while writing the data to the file, it tries to close it. The above code is
+equivalent to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;some_file&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Hola!&#39;</span><span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p>While comparing it to the first example we can see that a lot of boilerplate code is
+eliminated just by using with. The main advantage of using a with statement is that it
+makes sure our file is closed without paying attention to how the nested block exits.</p></li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</li>
+<li><p>We specifically import <code class="xref py py-class docutils literal notranslate"><span class="pre">closing</span></code> for use with methods that can’t be used as context managers,
+specifically, the return object of <code class="xref py py-func docutils literal notranslate"><span class="pre">connect_db()</span></code>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Functionally the same as <code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<ol class="arabic simple" start="6">
+<li><p><code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">flask</span> <span class="pre">import</span> <span class="pre">Flask</span></code></p></li>
+</ol>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>Lets us use Flask app initialization which is what runs this website</p></li>
+</ol>
+</div></blockquote>
+<ol class="arabic simple" start="7">
+<li><p><code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">flask</span> <span class="pre">import</span> <span class="pre">g</span></code></p></li>
+</ol>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>Lets us use the <code class="xref py py-class docutils literal notranslate"><span class="pre">g</span></code> object (short for “global” <em>within a context</em> meaning that the data stored in the
+object is lost after the context ends) of Flask.</p></li>
+<li><p>“To share data that is valid for one request only from one function to another, a global
+variable is not good enough because it would break in threaded environments. Flask provides you
+with a special object that ensures it is only valid for the active request and that will return
+different values for each request. In a nutshell: it does the right thing, like it does for the
+<code class="docutils literal notranslate"><span class="pre">request</span></code> and <code class="docutils literal notranslate"><span class="pre">session</span></code> objects.”</p></li>
+<li><p>While using the website, or doing anything in the application context, the data of the website
+and request can be accessed through the <code class="xref py py-class docutils literal notranslate"><span class="pre">g</span></code> object. That way, we don’t have to pass around
+the whole application object through each method that we need to run.</p></li>
+<li><p><a class="reference external" href="http://flask.pocoo.org/docs/1.0/appcontext/">Flask doc</a> on App Contexts</p></li>
+</ol>
+</div></blockquote>
+<ol class="arabic simple" start="8">
+<li><p><code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">tasa_website.views</span></code> and <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">tasa_website.auth</span></code></p></li>
+</ol>
+<blockquote>
+<div><ol class="loweralpha">
+<li><p>These are imports that aren’t actually ‘used’ but are needed</p></li>
+<li><p>From Flask documentation:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Circular Imports: Every Python programmer hates them, and yet we just added some: circular
+imports (That’s when two modules depend on each other. In this case <code class="file docutils literal notranslate"><span class="pre">views.py</span></code> depends on
+<code class="file docutils literal notranslate"><span class="pre">__init__.py</span></code>). Be advised that this is a bad idea in general but here it is actually fine.
+The reason for this is that we are not actually using the views in <code class="file docutils literal notranslate"><span class="pre">__init__.py</span></code> and just
+ensuring the module is imported and we are doing that at the bottom of the file.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Essentially, in <code class="file docutils literal notranslate"><span class="pre">views.py</span></code> and <code class="file docutils literal notranslate"><span class="pre">auth.py</span></code>, decorators are used to help fulfill what Flask is useful
+for. To use those decorators, the modules (the other Python files) have to be imported in
+<code class="file docutils literal notranslate"><span class="pre">__init__.py</span></code>. Additionally, in <code class="file docutils literal notranslate"><span class="pre">views.py</span></code> and <code class="file docutils literal notranslate"><span class="pre">auth.py</span></code>, we need to import
+<code class="file docutils literal notranslate"><span class="pre">__init__.py</span></code> to access vital functions, making them dependent on each other. This is fine
+because in <code class="file docutils literal notranslate"><span class="pre">__init__.py</span></code>, we import at the end of the file, after the application object
+is created and we don’t use anything from those modules.</p></li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="global-variables-and-statements">
+<h3>Global Variables and Statements<a class="headerlink" href="#global-variables-and-statements" title="Permalink to this headline">¶</a></h3>
+<p>The following are all declared for configuration purposes and can be accessed as attributes of the
+Flask app config:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CWD</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+<span class="n">ROOT</span> <span class="o">=</span> <span class="s1">&#39;tasa_website/&#39;</span>
+<span class="n">DATABASE</span> <span class="o">=</span> <span class="s1">&#39;tasa_website/tasa_website.db&#39;</span>
+<span class="n">CONFIG</span> <span class="o">=</span> <span class="s1">&#39;tasa_website/config.yaml&#39;</span>
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">IMAGE_FOLDER</span> <span class="o">=</span> <span class="s1">&#39;static/images/events/&#39;</span>
+<span class="n">OFFICER_IMAGE_FOLDER</span> <span class="o">=</span> <span class="s1">&#39;static/images/officers/&#39;</span>
+<span class="n">FAMILY_IMAGE_FOLDER</span> <span class="o">=</span> <span class="s1">&#39;static/images/families/&#39;</span>
+<span class="n">FILES_FOLDER</span> <span class="o">=</span> <span class="s1">&#39;static/files/&#39;</span>
+<span class="n">SCRAPBOOK_FOLDER</span> <span class="o">=</span> <span class="s1">&#39;static/images/scrapbook/&#39;</span>
+
+<span class="n">secrets</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config</span><span class="p">:</span>
+    <span class="n">secrets</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">secrets</span><span class="p">[</span><span class="s1">&#39;secret&#39;</span><span class="p">]</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;MAX_CONTENT_LENGTH&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="c1"># 16 megabytes</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">CWD</span> <span class="pre">=</span> <span class="pre">os.getcwd()</span></code> gets the current working directory of where the process is being run, which is
+<code class="file docutils literal notranslate"><span class="pre">__init__.py</span></code>.
+<code class="docutils literal notranslate"><span class="pre">ROOT</span> <span class="pre">=</span> <span class="pre">'tasa_website/'</span></code> is the root directory of the website.
+<code class="docutils literal notranslate"><span class="pre">DATABASE</span> <span class="pre">=</span> <span class="pre">'tasa_website/tasa_website.db'</span></code> is the location of the database file.
+<code class="docutils literal notranslate"><span class="pre">CONFIG</span> <span class="pre">=</span> <span class="pre">'tasa_website/config.yaml'</span></code> is the location of the YAML config file.
+<code class="docutils literal notranslate"><span class="pre">DEBUG</span> <span class="pre">=</span> <span class="pre">True</span></code> enables debug mode for the local version of the website. When there is an error while using the Flask application in your local environment, an interactive error traceback with console will be displayed.
+<code class="docutils literal notranslate"><span class="pre">IMAGE_FOLDER</span> <span class="pre">=</span> <span class="pre">'static/images/events/'</span></code> is the location of the event images.
+<code class="docutils literal notranslate"><span class="pre">OFFICER_IMAGE_FOLDER</span> <span class="pre">=</span> <span class="pre">'static/images/officers/'</span></code> is the location of the officer images.
+<code class="docutils literal notranslate"><span class="pre">FAMILY_IMAGE_FOLDER</span> <span class="pre">=</span> <span class="pre">'static/images/families/'</span></code> is the location of the family images.
+<code class="docutils literal notranslate"><span class="pre">FILES_FOLDER</span> <span class="pre">=</span> <span class="pre">'static/files/'</span></code> is the location of the files.</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">secrets</span> <span class="pre">=</span> <span class="pre">{}</span></code></p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Declares the secret variable as an empty dictionary</p></li>
+<li><p>We need it as a dictionary for ease of indexing</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">open(CONFIG,</span> <span class="pre">'r')</span> <span class="pre">as</span> <span class="pre">config:</span></code></p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Opens :file:<code class="docutils literal notranslate"><span class="pre">CONFIG</span></code> (earlier declared) file in read mode <code class="docutils literal notranslate"><span class="pre">r</span></code> as the variable config</p></li>
+<li><p>Closes config file when execution of block is finished</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p><code class="docutils literal notranslate"><span class="pre">secrets</span> <span class="pre">=</span> <span class="pre">yaml.load(config)</span></code></p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">yaml.load()</span></code> method loads the given YAML file and converts it to a Python object</p></li>
+<li><p>Because the YAML file is formatted to be like a dictionary, the file is converted to a
+dictionary</p></li>
+<li><p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">secrets</span></code> variable now contains all the YAML key-value pairs</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li><p><code class="docutils literal notranslate"><span class="pre">SECRET_KEY</span> <span class="pre">=</span> <span class="pre">secrets['secret']</span></code></p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Gets the secret key of the application from the secrets dictionary</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p><code class="docutils literal notranslate"><span class="pre">app</span> <span class="pre">=</span> <span class="pre">Flask(__name__)</span></code></p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Declares the <code class="xref py py-class docutils literal notranslate"><span class="pre">Flask</span></code> application object of the website and sets it to the app variable</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="6">
+<li><p><code class="docutils literal notranslate"><span class="pre">app.config.from_object(__name__)</span></code></p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">app.config</span></code> is a dictionary</p></li>
+<li><p>Sets the configurations to that of the website</p></li>
+<li><p>We declared these configurations earlier in __init__.py in global statements and variables</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="7">
+<li><p><code class="docutils literal notranslate"><span class="pre">app.config['MAX_CONTENT_LENGTH']</span> <span class="pre">=</span> <span class="pre">16</span> <span class="pre">*</span> <span class="pre">1024</span> <span class="pre">*</span> <span class="pre">1024</span></code></p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sets the max file size for both images and files to 16 megabytes</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">connect_db</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATABASE&#39;</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">init_db</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">connect_db</span><span class="p">())</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">open_resource</span><span class="p">(</span><span class="s1">&#39;schema.sql&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">executescript</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">before_request</span>
+<span class="k">def</span> <span class="nf">before_request</span><span class="p">():</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">connect_db</span><span class="p">()</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Row</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">teardown_request</span>
+<span class="k">def</span> <span class="nf">teardown_request</span><span class="p">(</span><span class="n">exception</span><span class="p">):</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s1">&#39;db&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">db</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">query_db</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">one</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+    <span class="n">rv</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">rv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">rv</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span> <span class="k">if</span> <span class="n">one</span> <span class="k">else</span> <span class="n">rv</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">connect_db()</span></code> returns a Connection object that represents the database. <code class="docutils literal notranslate"><span class="pre">'DATABASE'</span></code> is a
+configuration key pointing at the database file that was defined earlier.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">init_db()</span></code> intializes the database.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">closing(connect_db())</span> <span class="pre">as</span> <span class="pre">db:</span></code></p>
+<ul>
+<li><p>The variable <code class="xref py py-class docutils literal notranslate"><span class="pre">db</span></code> is set to the <code class="docutils literal notranslate"><span class="pre">Connection</span></code> object which represents our database.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">app.open_resource('schema.sql',</span> <span class="pre">mode='r')</span> <span class="pre">as</span> <span class="pre">f:</span></code></p>
+<ul>
+<li><p>Opens <code class="file docutils literal notranslate"><span class="pre">schema.sql</span></code> in read mode</p></li>
+<li><p>The variable <code class="docutils literal notranslate"><span class="pre">f</span></code> is set to the text inside <code class="file docutils literal notranslate"><span class="pre">schema.sql</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">db.cursor().executescript(f.read())()</span></code> takes the contents of <code class="file docutils literal notranslate"><span class="pre">schema.sql</span></code>, which
+creates the empty tables within the database, and executes it</p>
+<ul>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">db.cursor()</span></code> returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">Cursor</span></code> object that can execute database queries</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">executescript()</span></code> will execute the given params</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">f.read()</span></code> will read the contents of <code class="docutils literal notranslate"><span class="pre">f</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">db.commit()</span></code></p>
+<ul>
+<li><p>Any changes written to the database are pushed to the actual file</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">before_request()</span></code> opens the database connection.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">teardown_request(exception)()</span></code> calls the <code class="xref py py-func docutils literal notranslate"><span class="pre">getattr()</span></code> function to get the attributes of
+an object. In this case, it will be the attributes of any objects from the database.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">query_db(query,</span> <span class="pre">args=(),</span> <span class="pre">one=False)()</span></code> is a query function that retrieves the cursor, then
+executes and fetches the results from the database. It is used in views.py to retrieve a list of
+objects created from the database (e.g. the officer objects that are passed to <code class="file docutils literal notranslate"><span class="pre">officers.html</span></code>).</p></li>
+</ul>
+</div>
+</div>
 </div>
 
 
@@ -52,10 +410,17 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="nonpackage.html">tasa_website folder (non-package)</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">tasa_website folder (package)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">tasa_website folder (package)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#init-py">__init__.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#imports">Imports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#global-variables-and-statements">Global Variables and Statements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#methods">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
