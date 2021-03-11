@@ -34,6 +34,48 @@
             
   <div class="section" id="tasa-website-folder-non-package">
 <span id="nonpackage"></span><h1>tasa_website folder (non-package)<a class="headerlink" href="#tasa-website-folder-non-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="run-py">
+<h2>run.py<a class="headerlink" href="#run-py" title="Permalink to this headline">¶</a></h2>
+<p>When the <strong class="command">make run</strong> command is called in your command line, <code class="file docutils literal notranslate"><span class="pre">run.py</span></code> is used to start
+the application on a local development server. In <code class="file docutils literal notranslate"><span class="pre">run.py</span></code>, <strong class="command">tasa_website</strong> package (aka
+folder is located and the <code class="file docutils literal notranslate"><span class="pre">__init__.py</span></code> file is executed. This binds the objects it defines to
+names in the <strong class="command">tasa_website</strong> package’s namespace (e.g. <code class="docutils literal notranslate"><span class="pre">ROOT</span> <span class="pre">=</span> <span class="pre">'tasa_website/'</span></code> is used in
+<code class="file docutils literal notranslate"><span class="pre">views.py</span></code> when building file paths to reference any images used in the <strong class="command">static</strong>
+folder).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tasa_website</span> <span class="kn">import</span> <span class="n">app</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="imports">
+<h3>Imports<a class="headerlink" href="#imports" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">app</span></code> lets us call <em>app</em> directly in <code class="file docutils literal notranslate"><span class="pre">run.py</span></code>. Writing only <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">tasa_website</span></code>
+would mean we’d have to write <code class="docutils literal notranslate"><span class="pre">tasa_website.app</span></code> to access the <em>app</em> object inside the :command:`
+tasa_website` namespace.</p>
+<p>Read the section for <code class="file docutils literal notranslate"><span class="pre">__init__.py</span></code> before continuing.</p>
+</div>
+<div class="section" id="statements">
+<h3>Statements<a class="headerlink" href="#statements" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>When executing a program in Python, several variables, two of which are <code class="docutils literal notranslate"><span class="pre">__name__</span></code> and <code class="docutils literal notranslate"><span class="pre">__main__</span></code>,
+are immediately set. <code class="docutils literal notranslate"><span class="pre">__name__</span></code> is evaluated as the name of the current module (aka file). If the
+module is run directly (from the command line), <code class="docutils literal notranslate"><span class="pre">__name__</span></code> is instead set to the string <code class="docutils literal notranslate"><span class="pre">'__main__'</span></code>.</p></li>
+<li><p>One such exception to this is seen in our code when a file is implicitly executed like <code class="file docutils literal notranslate"><span class="pre">__init__.py</span></code>
+is. In this case, <code class="docutils literal notranslate"><span class="pre">__name__</span></code> will be set to the package name because when <strong class="command">make run</strong> is
+called in the command line, it is run as the main file.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Runs the Flask app on the host on port 5000</p></li>
+</ul>
+</div>
+</div>
 </div>
 
 
@@ -55,7 +97,14 @@
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">tasa_website folder (non-package)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">tasa_website folder (non-package)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#run-py">run.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#imports">Imports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#statements">Statements</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="package.html">tasa_website folder (package)</a></li>
 </ul>
 

@@ -13,11 +13,18 @@ Documentation for the tasa_website repository
 This is the documentation for TASA's website. Basic knowledge of Python, HTML, CSS, SQL, and JS is 
 assumed.
 
+General background:
+-------------------
+
+- `Modules vs. packages <https://realpython.com/python-modules-packages/#python-packages>`_
+- `HTTP requests <https://yoast.com/reduce-http-requests-wordpress/>`_
+- When calling :command:`make run`, :file:`run.py` is executed.
+
 tasa_website structure
 ----------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    nonpackage
