@@ -22,21 +22,26 @@ tasa_website folder (package)
     import tasa_website.views
     import tasa_website.auth
 
-
 Imports
 ~~~~~~~
+
+.. _import os section:
 
 1. ``import os``
 
   a. From the `Python docs <https://docs.python.org/3/library/os.html>`__, "this module provides a 
      portable way of using operating system dependent functionality," e.g. getting the current working 
      directory with the :func:`getcwd()` function.
+
+.. _import string section:
      
 2. ``import string``
 
   a. From the `Python docs <https://docs.python.org/2/library/string.html>`__, "the :class:`string` 
      module contains a number of useful constants and classes, as well as some deprecated legacy 
      functions that are also available as methods on strings."
+
+.. _import sqlite3 section:
 
 3. ``import sqlite3``
 
@@ -55,6 +60,8 @@ Imports
 .. _33: https://youtube.com/playlist?list=PL6BsET-8jgYVk_CBkIP9WbxckgwMIWuTk
 .. _34: https://youtube.com/playlist?list=PL6BsET-8jgYVSWsg45Zm-aSb7it_mvuOZ
 .. _35: https://youtube.com/playlist?list=PL6BsET-8jgYWoTuANOebuQVct9mAovzga
+
+.. _import yaml section:
 
 4. ``import yaml``
 
@@ -310,4 +317,172 @@ Methods
   executes and fetches the results from the database. It is used in views.py to retrieve a list of 
   objects created from the database (e.g. the officer objects that are passed to :file:`officers.html`).
 
+views.py
+--------
+
+Imports for the Google Drive API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    from googleapiclient import discovery
+    from httplib2 import Http
+    from oauth2client import file, client, tools 
+
+1. ``from googleapiclient import discovery``
+
+  - The ``discovery`` module is used in :func:`driveAPI_authentication()` for constructing a :class:`Resource` 
+    object to interact with the Google Drive API. In :file:`views.py`, it is used for authentication 
+    when accessing the Drive API to retrieve images from the tasa.berkeley@gmail.com Drive.
+
+2. ``from httplib2 import Http``
+
+  - ``Http`` is imported for use in :func:`driveAPI_authentication()` when building an instance 
+    of the :class:`Http` class. The object is then passed into the function that constructs the Resource
+    object mentioned above.
+
+3. ``from oauth2client import file, client, tools``
+
+  - ``oauth2client`` is a client library used for OAuth2, especially used with Google APIs. The 
+    file, client, tools modules that are imported are necessary for the function of 
+    :func:`driveAPI_authentication()`.
+
+General Imports for Utility Purposes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    import json
+    import os
+    import random
+    import re
+    import requests
+    import string
+    import sqlite3
+    import time
+    import urllib
+    import yaml
+    import collections
+    import io
+    import csv
+    import zipfile
+
+1. ``import json``
+
+  - The :func:`dump()` function from the ``json`` module is used to serialize a dictionary of 
+    :class:`officer` objects returned by :func:`query_db()`. 
+
+2. ``import os``
+
+  - Refer to the :ref:`Imports section <import os section>` of :file:`__init__.py`.
+
+3. ``import random``
+
+  - Imported for the :func:`choice()` function that is used in :func:`rollLateJar()`. A random late
+    jar is selected from either list of late jars and returned.
+
+4. ``import re``
+
+  - The ``re`` module provides operations for regular expression matching. The module's :func:`re()`
+    function is used in :func:`add_event()` to obtain the id from a Facebook event's URL address.
+
+5. ``import requests``
+
+  - Requests is an HTTP library, written in Python, that provides functionality for various methods
+    like ``GET``.
+
+6. ``import string``
+
+  - Refer to the :ref:`Imports section <import string section>` of :file:`__init__.py`.
+
+7. ``import sqlite3``
+
+  - Refer to the :ref:`Imports section <import sqlite3 section>` of :file:`__init__.py`.
+
+8. ``import time``
+
+  - The :func:`time()` function is used to get the current time in :func:`download_checkin_info()`
+    when writing a member's event check-in information data to the client. 
+
+9. ``import urllib``
+
+  - ``urllib`` contains several other modules used for handling URLs (e.g. :class:`urllib.request`
+    and :class:`urllib.error`.
+
+10. ``import yaml``
+
+  - Refer to the :ref:`Imports section <import yaml section>` of :file:`__init__.py`.
+
+11. ``import collections``
+
+  - The :class:`collections` module provides several alternatives to Python's set of built-in containers
+    (dict, list, set, and tuple). In our code, the :func:`defaultdict` function is used in 
+    :func:`download_checkin_info()` to store the key-value pairs associated for individual member 
+    objects that have been returned by :func:`query_db()`.
+
+12. ``import io``
+
+  - The ``io`` module is imported to provide functionality for handling streams in :func:`download_checkin_info()`.
+    An instance of the :class:`io.BytesIO()` class is created in :func:`download_checkin_info()` and
+    is then used in passing the check-in information to a zip file.
+
+13. ``import csv``
+
+  - The ``csv`` module is imported for use in CSV parsing and writing in :func:`download_checkin_info`.
+
+14. ``import zipfile``
+
+  - The ``zipfile`` module is imported for use in :func:`download_checkin_info` when creating the zipfile
+    that will be downloaded when the function is called.
+
+Imports Used By Flask
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    from flask import Flask
+    from flask import flash
+    from flask import redirect
+    from flask import render_template
+    from flask import request
+    from flask import url_for
+    from flask import Response
+    from flask import send_file
+
+1. ``from flask import Flask``
+
+  - General import needed to create the Flask object when running the application.
+
+2. ``from flask import flash``
+
+  - Flashes a message to the next request. In order to remove the flashed message from the session 
+    and to display it to the user, the template has to call :func:`get_flashed_messages`.
+
+3. ``from flask import redirect``
+
+  - Returns a response object (a WSGI application) that, if called, redirects the client to the target 
+    location. Used in :file:`views.py` to handle redirecting to the correct url.
+
+4. ``from flask import render_template``
+
+  - Renders a template from the template folder with the given context.
+
+5. ``from flask import request``
+
+  - Used in :file:`views.py` so that the :class:`request` object's attribute can be used to obtain form
+    data that was submitted through form data in the HTML.
+
+6. ``from flask import url_for``
+
+  - Generates a URL to the given endpoint with the method provided.
+
+7. ``from flask import Response``
+
+  - The :class:`Response` class is imported for use by the Flask application. 
+
+8. ``from flask import send_file``
+
+  - Used in :func:`download_checkin_info()` when sending the contents of a file to the client. This 
+    will use the most efficient method available and configured, so by default, it will try to use 
+    the WSGI server's file_wrapper support.
 
